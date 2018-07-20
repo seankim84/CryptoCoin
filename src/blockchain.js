@@ -1,6 +1,6 @@
 const CryptoJS = require("crypto-js");
 
-
+// # defined the  Block
 class Block {
     constructor(index, hash, previousHash, timestamp, data) {
         this.index = index;
@@ -25,11 +25,14 @@ const getLastBlock = () => blockchain[blockchain.length - 1];
 
 const getTimeStamp = () => new Date().getTime() / 1000 ;
 
+const getBlockchain = () => blockchain;
+
 const createHash = (index, previousHash, timestamp, data ) => {
     CryptoJS.SHA256(index + previousHash + timestamp + JSON.stringify(data)
     ).toString();
 }
 
+// # define the newBlock
 const createNewBlock = data => {
     const previousBlock = getLastBlock(); 
     const newBlockIndex = previousBlock.index + 1;
@@ -53,7 +56,7 @@ const createNewBlock = data => {
     return newBlock;
 };
 
-
+// # Validating;
 const getBlockHash = block => createHash(block.index, block.previousHash, block.timestamp, block.data)
 
 const isNewBlockValid = (candidateBlock, latestBlock) => {
@@ -95,10 +98,29 @@ const isChainValid = (candidateChain) => {
         return false;
     }
     for (let i=1; i < candidateChain.length; i++){
-        if(!isNewBlockvalid(candidateChain[i], candidateChain[i-1])){
+        if(!isNewBlockValid(candidateChain[i], candidateChain[i-1])){
             return false;
         }
     }
     return true;
+};
+
+// # Replacing the Chain
+const replaceChain = candidateChain => {
+    if(isChainValid(candidateChain) && candidateChain.length > getBlockchain.length){
+        blockchain = candidateChain;
+        return true;
+    } else {
+        return false;
+    }
+};
+
+const addBlockToChain = candidateBlock => {
+    if(isNewBlockValid(candidateBlock, getLastBlock())){
+        getBlockchain.push(candidateBlock);
+        return true;
+    } else {
+        return false;
+    }
 };
 
