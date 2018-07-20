@@ -1,0 +1,13 @@
+{
+  "name": "CryptoCoin",
+  "version": "1.0.0",
+  "description": "CryptoCoin with Node.js and React",
+  "main": "src/server.js",
+  "repository": "https://github.com/seankim84/CryptoCoin.git",
+  "author": "SeanKim <sean.kim84@gmail.com>",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "cryptojs": "^2.5.3"
+  }
+}
