@@ -69,6 +69,10 @@ cookie@0.3.1:
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/cookie/-/cookie-0.3.1.tgz#e7e0a1f9ef43b4c8ba925c5c5a96e806d16873bb"
 
+crypto-js@^3.1.9-1:
+  version "3.1.9-1"
+  resolved "https://registry.yarnpkg.com/crypto-js/-/crypto-js-3.1.9-1.tgz#fda19e761fc077e01ffbfdc6e9fdfc59e8806cd8"
+
 cryptojs@^2.5.3:
   version "2.5.3"
   resolved "https://registry.yarnpkg.com/cryptojs/-/cryptojs-2.5.3.tgz#909547ecf15bac456e275459b39f2ef45d7fcbb9"
