@@ -1,4 +1,4 @@
-const CryptoJS = require("crypto-js");
+const CryptoJS = require('cryptojs')
 
 // # defined the  Block
 class Block {
@@ -52,7 +52,7 @@ const createNewBlock = data => {
         newTimeStamp,
         data
     );
-
+    addBlockToChain(newBlock);
     return newBlock;
 };
 
@@ -124,3 +124,7 @@ const addBlockToChain = candidateBlock => {
     }
 };
 
+module.exports = {
+    getBlockchain,
+    createNewBlock
+};
