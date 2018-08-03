@@ -1,6 +1,37 @@
 const WebSockets = require("ws");
+  BlockChain = require("./blockchain"); 
+
+  const { getLastBlock } = BlockChain;
 
 const sockets = [];
+
+// Message Types
+const GET_LATEST = "GET_LATEST";
+const GET_ALL = "GET_ALL";
+const BLOCKCHAIN_RESPONSE = "BLCOKCHAIN_RESPONSE";
+
+// Message Creators
+const getLatest = () => {
+  return {  
+    type: GET_LATEST,
+    data: null
+  }
+}
+
+const getAll = () => {
+  return {
+    type: GET_ALL,
+    data: null
+  }
+}
+
+const blockchainResponse = (data) => {
+  return {
+    type: BLOCKCHAIN_RESPONSE,
+    data
+  }
+}
+
 
 const getSockets = () => sockets;
 
@@ -12,16 +43,17 @@ const startP2PServer = server => {
   console.log("Seanscoin P2P Server running");
 };
 
-const initSocketConnection = socket => {
-  sockets.push(socket);
-  handleSocketError(socket);
-  socket.on("message", (data) =>   { // message를 받으면 data를 console.log
-    console.log(data);
-  });
-  setTimeout(() => {
-    socket.send("welcome");
-  }, 5000);
+const initSocketConnection = ws => {
+  sockets.push(ws);
+  handleSocketMessage(ws);
+  handleSocketError(ws);
 };
+
+const handleSocketMessage = ws => {
+  ws.on("message", data => {
+
+  })
+}
 
 const handleSocketError = ws => {
   const closeSocketConnection = ws => {
