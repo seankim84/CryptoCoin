@@ -8,8 +8,8 @@ const { getBlockchain, createNewBlock } = Blockchain;
 const { startP2PServer, connectToPeers } = P2P;
 
 // Psssst. Don't forget about typing 'export HTTP_PORT=4000' in your console
-const PORT = process.env.HTTP_PORT || 3000;
-
+const PORT = process.env.HTTP_PORT || 3000; // HTTP_PORT라는 이름의 environment variable을 찾는다.
+//therefore, can use the "export HTTP_PORT='PORT_VALUE'"
 const app = express();
 app.use(bodyParser.json());
 app.use(morgan("combined"));
@@ -30,8 +30,8 @@ app.post("/peers", (req, res) => {
   res.send();
 });
 
-const server = app.listen(PORT, () => 
-  console.log(`Seans HTTP Server running on port ${PORT} ✅`)
-);
-
-startP2PServer(server);
+const server = app.listen(PORT, () => console.log(`Seans HTTP Server running on port ${PORT} ✅`));
+startP2PServer(server); //P2P server에게 express를 준다.
+//app.listen을  server라는 변수에 넣은 이유.
+//HTTP_SERVER 위에 WebSocket Server를 올렸다.
+//websocket server와 HTTP_Server는 같은 포트에서 실행이 가능하다. 프로토콜이 다르기 때문에.

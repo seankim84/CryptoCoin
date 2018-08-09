@@ -1,4 +1,4 @@
-const WebSockets = require("ws");
+const WebSockets = require("ws"); //socket means between server and server connection. no Client.
   BlockChain = require("./blockchain"); 
 
   const { getLastBlock } = BlockChain;
@@ -37,7 +37,7 @@ const getSockets = () => sockets;
 
 const startP2PServer = server => {
   const wsServer = new WebSockets.Server({ server });
-  wsServer.on("connection", ws => {
+  wsServer.on("connection", ws => { //누군가 ws에 접근시 ws에서 initSocketConnection을 실행
     initSocketConnection(ws);
   });
   console.log("Seanscoin P2P Server running");
