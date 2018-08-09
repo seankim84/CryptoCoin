@@ -1,6 +1,6 @@
 const express = require("express"),
   bodyParser = require("body-parser"),
-  morgan = require("morgan"),
+  morgan = require("morgan"), // At the console shown the information u need.
   Blockchain = require("./blockchain"),
   P2P = require("./p2p");
 
@@ -30,8 +30,8 @@ app.post("/peers", (req, res) => {
   res.send();
 });
 
-const server = app.listen(PORT, () =>
-  console.log(`Nomadcoin HTTP Server running on port ${PORT} ✅`)
+const server = app.listen(PORT, () => 
+  console.log(`Seans HTTP Server running on port ${PORT} ✅`)
 );
 
 startP2PServer(server);

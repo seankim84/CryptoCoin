@@ -1,7 +1,9 @@
+// parse : convert text into a JavaScript Object
+
 const CryptoJS = require("crypto-js");
 
 class Block {
-  constructor(index, hash, previousHash, timestamp, data) {
+  constructor(index, hash, previousHash, timestamp, data) { // by using this constructor, create new things
     this.index = index;
     this.hash = hash;
     this.previousHash = previousHash;
@@ -10,7 +12,7 @@ class Block {
   }
 }
 
-const genesisBlock = new Block(
+const genesisBlock = new Block( // Make by constructor, u can use only value on this object
   0,
   "2C4CEB90344F20CC4C77D626247AED3ED530C1AEE3E6E85AD494498B17414CAC",
   null,
@@ -18,7 +20,7 @@ const genesisBlock = new Block(
   "This is the genesis!!"
 );
 
-let blockchain = [genesisBlock];
+let blockchain = [ genesisBlock ]; // Put the genesis block inside the block chain
 
 const getLastBlock = () => blockchain[blockchain.length - 1];
 
@@ -35,12 +37,14 @@ const createNewBlock = data => {
   const previousBlock = getLastBlock();
   const newBlockIndex = previousBlock.index + 1;
   const newTimestamp = getTimestamp();
+
   const newHash = createHash(
     newBlockIndex,
     previousBlock.hash,
     newTimestamp,
     data
   );
+
   const newBlock = new Block(
     newBlockIndex,
     newHash,
@@ -48,13 +52,15 @@ const createNewBlock = data => {
     newTimestamp,
     data
   );
+
   addBlockToChain(newBlock);
   return newBlock;
 };
 
-const getBlocksHash = block =>
+const getBlocksHash = block => 
   createHash(block.index, block.previousHash, block.timestamp, block.data);
 
+//Validating the Block
 const isNewBlockValid = (candidateBlock, latestBlock) => {
   if (!isNewStructureValid(candidateBlock)) {
     console.log("The candidate block structure is not valid");
