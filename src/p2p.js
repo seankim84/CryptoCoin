@@ -1,7 +1,7 @@
 const WebSockets = require("ws"); //socket means between server and server connection. no Client.
   BlockChain = require("./blockchain"); 
 
-const { getLastBlock, isBlockStructureValid } = BlockChain; 
+const { getNewestBlock, isBlockStructureValid, addBlockToChain, replaceChain } = BlockChain; 
   //First 가장 최근블록 요청
 
 const sockets = [];
@@ -76,32 +76,42 @@ const handleSocketMessage = ws => { //Check the data and then, data chage to Jso
         sendMessage(ws, responseLatest());
         break;
       case BLOCKCHAIN_RESPONSE:
-        const receiveBlocks = message.data
-        if(receiveBlocks === null){
+        const receivedBlocks = message.data
+        if(receivedBlocks === null){
           break;
         }
-        handleBlockChainResponse(receiveBlocks);
+        handleBlockChainResponse(receivedBlocks);
         break;
       }
   });
 }
 
-// For the receiveBlocks valid.
-const handleBlockChainResponse = receiveBlocks => {
-  if(receiveBlocks.length === 0){
+// Validating for receivedBlocks.
+const handleBlockChainResponse = receivedBlocks => {
+  if(receivedBlocks.length === 0){
     console.log("Received blocks have a length of 0")
     return;
   }
-const latestBlockReceived = receiveBlocks[receiveBlocks.length - 1] // 이렇게 하면 가장 마지막 block이 된다.
-  if (!isBlockStructureValid(latestBlockReceived)){ //blockchain.js 로 부터 structure valid를 불러와, 검증한다.
-    console.log("The block structure of the block received is not valid")
-    return;
-  }
-};
+  const latestBlockReceived = receivedBlocks[receivedBlocks.length - 1] // 이렇게 하면 가장 마지막 block이 된다.
+    if (!isBlockStructureValid(latestBlockReceived)){ //blockchain.js 로 부터 structure valid를 불러와, 검증한다.
+      console.log("The block structure of the block received is not valid")
+      return;
+    }
+  const newestBlock = getNewestBlock();
+    if(latestBlockReceived.index > newestBlock.index){ // By Using the Hahs, check the block order.
+      if(newestBlock.hash === latestBlockReceived.previousHash){
+        addBlockToChain(latestBlockReceived); // 딱 한개 블록만 앞서갔다면 추가하면 된다 
+      } else if(receivedBlocks.length === 1){
+        //to do, get all blocks, we are way behind.
+      } else {
+        replaceChain(receivedBlocks)
+      }
+    }
+  };
 
 const sendMessage = (ws, message) => ws.send(JSON.stringify(message)); // JSON.parse를 할것이기 때문에 JSON.stringify를 해준다.
 
-const responseLatest = () => blockchainResponse([getLastBlock()])
+const responseLatest = () => blockchainResponse([getNewestBlock()])
 
 // Sockets Error Hanlder
 const handleSocketError = ws => {
