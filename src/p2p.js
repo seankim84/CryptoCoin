@@ -1,7 +1,7 @@
 const WebSockets = require("ws"); //socket means between server and server connection. no Client.
   BlockChain = require("./blockchain"); 
 
-const { getNewestBlock, isBlockStructureValid, addBlockToChain, replaceChain } = BlockChain; 
+const { getBlockchain, getNewestBlock, isBlockStructureValid, addBlockToChain, replaceChain } = BlockChain; 
   //First 가장 최근블록 요청
 
 const sockets = [];
@@ -75,16 +75,19 @@ const handleSocketMessage = ws => { //Check the data and then, data chage to Jso
       case GET_LATEST:
         sendMessage(ws, responseLatest());
         break;
+      case GET_ALL:
+        sendMessage(ws, responseAll())
+        break;
       case BLOCKCHAIN_RESPONSE:
         const receivedBlocks = message.data
-        if(receivedBlocks === null){
+        if(receivedBlocks === null) {
           break;
         }
         handleBlockChainResponse(receivedBlocks);
         break;
       }
   });
-}
+};
 
 // Validating for receivedBlocks.
 const handleBlockChainResponse = receivedBlocks => {
@@ -102,7 +105,7 @@ const handleBlockChainResponse = receivedBlocks => {
       if(newestBlock.hash === latestBlockReceived.previousHash){
         addBlockToChain(latestBlockReceived); // 딱 한개 블록만 앞서갔다면 추가하면 된다 
       } else if(receivedBlocks.length === 1){
-        //to do, get all blocks, we are way behind.
+        sendMessageToAll(getAll())
       } else {
         replaceChain(receivedBlocks)
       }
@@ -111,7 +114,11 @@ const handleBlockChainResponse = receivedBlocks => {
 
 const sendMessage = (ws, message) => ws.send(JSON.stringify(message)); // JSON.parse를 할것이기 때문에 JSON.stringify를 해준다.
 
+const sendMessageToAll = message => sockets.forEach(ws => sendMessage(ws, message)); 
+
 const responseLatest = () => blockchainResponse([getNewestBlock()])
+
+const responseAll = () => blockchainResponse(getBlockchain());
 
 // Sockets Error Hanlder
 const handleSocketError = ws => {
