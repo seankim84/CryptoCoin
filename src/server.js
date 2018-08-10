@@ -27,10 +27,10 @@ app.post("/blocks", (req, res) => {
 app.post("/peers", (req, res) => {
   const { body: { peer } } = req;
   connectToPeers(peer);
-  res.send();
+  res.send(); //
 });
 
-const server = app.listen(PORT, () => console.log(`Seans HTTP Server running on port ${PORT} ✅`));
+const server = app.listen(PORT, () => console.log(`Sean's HTTP Server running on port ${PORT} ✅`));
 startP2PServer(server); //P2P server에게 express를 준다.
 //app.listen을  server라는 변수에 넣은 이유.
 //HTTP_SERVER 위에 WebSocket Server를 올렸다.
