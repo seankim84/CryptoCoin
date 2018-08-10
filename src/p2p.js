@@ -1,13 +1,13 @@
 const WebSockets = require("ws"); //socket means between server and server connection. no Client.
   BlockChain = require("./blockchain"); 
 
-  const { getLastBlock } = BlockChain; 
+const { getLastBlock, isBlockStructureValid } = BlockChain; 
   //First 가장 최근블록 요청
 
 const sockets = [];
 
 // 살펴보니, 엄청 뒤쳐진걸 알게되었다면 전체 blockchain을 요청.(for replacing)
-// then, for the response, we have to response from request.
+// then, for the responsing, we have to response from request.
 /* This is the work like a redux for response managing */
 
 // Message Types
@@ -73,13 +73,35 @@ const handleSocketMessage = ws => { //Check the data and then, data chage to Jso
     console.log(message);
     switch(message.type){
       case GET_LATEST:
-        sendMessage(ws, getLastBlock());
+        sendMessage(ws, responseLatest());
+        break;
+      case BLOCKCHAIN_RESPONSE:
+        const receiveBlocks = message.data
+        if(receiveBlocks === null){
+          break;
+        }
+        handleBlockChainResponse(receiveBlocks);
         break;
       }
   });
 }
 
+// For the receiveBlocks valid.
+const handleBlockChainResponse = receiveBlocks => {
+  if(receiveBlocks.length === 0){
+    console.log("Received blocks have a length of 0")
+    return;
+  }
+const latestBlockReceived = receiveBlocks[receiveBlocks.length - 1] // 이렇게 하면 가장 마지막 block이 된다.
+  if (!isBlockStructureValid(latestBlockReceived)){ //blockchain.js 로 부터 structure valid를 불러와, 검증한다.
+    console.log("The block structure of the block received is not valid")
+    return;
+  }
+};
+
 const sendMessage = (ws, message) => ws.send(JSON.stringify(message)); // JSON.parse를 할것이기 때문에 JSON.stringify를 해준다.
+
+const responseLatest = () => blockchainResponse([getLastBlock()])
 
 // Sockets Error Hanlder
 const handleSocketError = ws => {
