@@ -3,12 +3,14 @@
 const CryptoJS = require("crypto-js");
 
 class Block {
-  constructor(index, hash, previousHash, timestamp, data) { // by using this constructor, create new things
+  constructor(index, hash, previousHash, timestamp, data, difficulty, nonce) { // by using this constructor, create new things
     this.index = index;
     this.hash = hash;
     this.previousHash = previousHash;
     this.timestamp = timestamp;
     this.data = data;
+    this.difficulty = difficulty;
+    this.nonce = nonce;
   }
 }
 
@@ -17,7 +19,9 @@ const genesisBlock = new Block( // Make by constructor, u can use only value on 
   "2C4CEB90344F20CC4C77D626247AED3ED530C1AEE3E6E85AD494498B17414CAC",
   null,
   1520312194926,
-  "This is the genesis!!"
+  "This is the genesis!!",
+  0,
+  0
 );
 
 let blockchain = [ genesisBlock ]; // Put the genesis block inside the block chain
@@ -28,7 +32,7 @@ const getTimestamp = () => new Date().getTime() / 1000;
 
 const getBlockchain = () => blockchain;
 
-const createHash = (index, previousHash, timestamp, data) =>
+const createHash = (index, previousHash, timestamp, data, difficulty, nonce) =>
   CryptoJS.SHA256(
     index + previousHash + timestamp + JSON.stringify(data)
   ).toString();
@@ -45,17 +49,35 @@ const createNewBlock = data => {
     data
   );
 
-  const newBlock = new Block(
+  const newBlock = findBlock(
     newBlockIndex,
-    newHash,
     previousBlock.hash,
     newTimestamp,
     data
   );
-
   addBlockToChain(newBlock);
-  require("./p2p").broadcastNewBlock();
+  require("./p2p").broadcastNewBlock(); 
   return newBlock;
+};
+
+const findBlock = (index, previousHash, timestamp, data, difficulty) => {
+  let nonce = 0;
+  while(true) { // true가 될때까지 반복
+    const hash = createHash(
+      index,
+      previousHash,
+      timestamp,
+      data,
+      difficulty,
+      nonce
+    );
+    //to do check amount of zeros(hash Matches difficulty)
+    if(none){
+
+    } else {
+        nonce++
+    }
+  }
 };
 
 
