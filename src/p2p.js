@@ -103,7 +103,9 @@ const handleBlockChainResponse = receivedBlocks => {
   const newestBlock = getNewestBlock();
     if(latestBlockReceived.index > newestBlock.index){ // By Using the Hahs, check the block order.
       if(newestBlock.hash === latestBlockReceived.previousHash){
-        addBlockToChain(latestBlockReceived); // 딱 한개 블록만 앞서갔다면 추가하면 된다 
+        if(addBlockToChain(latestBlockReceived)){
+          broadcastNewBlock();
+        } 
       } else if(receivedBlocks.length === 1){
         sendMessageToAll(getAll())
       } else {
@@ -119,6 +121,8 @@ const sendMessageToAll = message => sockets.forEach(ws => sendMessage(ws, messag
 const responseLatest = () => blockchainResponse([getNewestBlock()])
 
 const responseAll = () => blockchainResponse(getBlockchain());
+
+const broadcastNewBlock = () => sendMessageToAll(responseLatest())// 전체에게 blockchain response를 보냄
 
 // Sockets Error Hanlder
 const handleSocketError = ws => {
@@ -139,5 +143,6 @@ const connectToPeers = newPeer => { // This function to takes new Peer.(running 
 
 module.exports = {
   startP2PServer,
-  connectToPeers
+  connectToPeers,
+  broadcastNewBlock
 };

@@ -54,8 +54,10 @@ const createNewBlock = data => {
   );
 
   addBlockToChain(newBlock);
+  require("./p2p").broadcastNewBlock();
   return newBlock;
 };
+
 
 const getBlocksHash = block => 
   createHash(block.index, block.previousHash, block.timestamp, block.data);
