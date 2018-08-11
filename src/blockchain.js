@@ -1,6 +1,7 @@
 // parse : convert text into a JavaScript Object
 
-const CryptoJS = require("crypto-js");
+const CryptoJS = require("crypto-js"),
+      hexToBinary = require("hex-to-binary");
 
 class Block {
   constructor(index, hash, previousHash, timestamp, data, difficulty, nonce) { // by using this constructor, create new things
@@ -34,27 +35,21 @@ const getBlockchain = () => blockchain;
 
 const createHash = (index, previousHash, timestamp, data, difficulty, nonce) =>
   CryptoJS.SHA256(
-    index + previousHash + timestamp + JSON.stringify(data)
+    index + previousHash + timestamp + JSON.stringify(data) + difficulty + nonce
   ).toString();
 
 const createNewBlock = data => {
   const previousBlock = getNewestBlock();
   const newBlockIndex = previousBlock.index + 1;
   const newTimestamp = getTimestamp();
-
-  const newHash = createHash(
-    newBlockIndex,
-    previousBlock.hash,
-    newTimestamp,
-    data
-  );
-
   const newBlock = findBlock(
     newBlockIndex,
     previousBlock.hash,
     newTimestamp,
-    data
+    data,
+    20
   );
+
   addBlockToChain(newBlock);
   require("./p2p").broadcastNewBlock(); 
   return newBlock;
@@ -63,6 +58,7 @@ const createNewBlock = data => {
 const findBlock = (index, previousHash, timestamp, data, difficulty) => {
   let nonce = 0;
   while(true) { // true가 될때까지 반복
+    console.log("Current nonce:", nonce)
     const hash = createHash(
       index,
       previousHash,
@@ -71,15 +67,26 @@ const findBlock = (index, previousHash, timestamp, data, difficulty) => {
       difficulty,
       nonce
     );
-    //to do check amount of zeros(hash Matches difficulty)
-    if(none){
-
-    } else {
-        nonce++
-    }
+    if (hashMatchesDifficulty(hash,difficulty)) { //to do check amount of zeros(hash Matches difficulty)
+      return new Block(
+        index, 
+        hash, 
+        previousHash, 
+        timestamp, 
+        data, 
+        difficulty, 
+        nonce)
+    } 
+      nonce++
   }
 };
 
+const hashMatchesDifficulty = (hash, difficulty) => { // 여기서의 argument는 hash, difficulty 이다.
+  const hashInBinary = hexToBinary(hash); //
+  const requiredZeros = "0".repeat(difficulty); //"0" 을 difficulty만큼 반복
+  console.log("Trying difficulty:", difficulty, "with hash:", hash )
+  return hashInBinary.startsWith(requiredZeros);
+} 
 
 const getBlocksHash = block => 
   createHash(block.index, block.previousHash, block.timestamp, block.data);
