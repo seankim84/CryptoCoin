@@ -3,6 +3,10 @@
 const CryptoJS = require("crypto-js"),
       hexToBinary = require("hex-to-binary");
 
+
+const BLOCK_GENERATION_INTERVAL = 10; // 몇분마다 채굴되는지(초 단위)
+const DIFFICULTY_ADJUSMENT_INTERVAL = 10; // 얼마나 자주 블록 난이도를 조절할지
+
 class Block {
   constructor(index, hash, previousHash, timestamp, data, difficulty, nonce) { // by using this constructor, create new things
     this.index = index;
@@ -42,17 +46,28 @@ const createNewBlock = data => {
   const previousBlock = getNewestBlock();
   const newBlockIndex = previousBlock.index + 1;
   const newTimestamp = getTimestamp();
+  const difficulty = findDifficulty(); 
   const newBlock = findBlock(
     newBlockIndex,
     previousBlock.hash,
     newTimestamp,
     data,
-    20
+    20,
+    difficulty
   );
 
   addBlockToChain(newBlock);
   require("./p2p").broadcastNewBlock(); 
   return newBlock;
+};
+
+const findDifficulty = () => {
+  const newestBlock = getNewestBlock();
+  if (newestBlock.index % DIFFICULTY_ADJUSMENT_INTERVAL === 0 && newestBlock.index !== 0) { // 나눠진 결과가 0이라면
+    // calculate new Difficulty
+  } else {
+    return newBlock.difficulty;
+  }
 };
 
 const findBlock = (index, previousHash, timestamp, data, difficulty) => {
@@ -89,7 +104,7 @@ const hashMatchesDifficulty = (hash, difficulty) => { // 여기서의 argument�
 } 
 
 const getBlocksHash = block => 
-  createHash(block.index, block.previousHash, block.timestamp, block.data);
+  createHash(block.index, block.previousHash, block.timestamp, block.data, block.nonce);
 
 //Validating the Block
 const isBlockValid = (candidateBlock, latestBlock) => {
