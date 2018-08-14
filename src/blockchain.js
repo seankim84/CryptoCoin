@@ -1,14 +1,11 @@
-// parse : convert text into a JavaScript Object
-
 const CryptoJS = require("crypto-js"),
-      hexToBinary = require("hex-to-binary");
+  hexToBinary = require("hex-to-binary");
 
-
-const BLOCK_GENERATION_INTERVAL = 10; // 몇분마다 채굴되는지(초 단위)
-const DIFFICULTY_ADJUSMENT_INTERVAL = 10; // 얼마나 자주 블록 난이도를 조절할지
+const BLOCK_GENERATION_INTERVAL = 10;
+const DIFFICULTY_ADJUSMENT_INTERVAL = 10;
 
 class Block {
-  constructor(index, hash, previousHash, timestamp, data, difficulty, nonce) { // by using this constructor, create new things
+  constructor(index, hash, previousHash, timestamp, data, difficulty, nonce) {
     this.index = index;
     this.hash = hash;
     this.previousHash = previousHash;
@@ -19,17 +16,17 @@ class Block {
   }
 }
 
-const genesisBlock = new Block( // Make by constructor, u can use only value on this object
+const genesisBlock = new Block(
   0,
   "2C4CEB90344F20CC4C77D626247AED3ED530C1AEE3E6E85AD494498B17414CAC",
   null,
-  1520312194926,
+  1520408084,
   "This is the genesis!!",
   0,
   0
 );
 
-let blockchain = [ genesisBlock ]; // Put the genesis block inside the block chain
+let blockchain = [genesisBlock];
 
 const getNewestBlock = () => blockchain[blockchain.length - 1];
 
@@ -46,39 +43,41 @@ const createNewBlock = data => {
   const previousBlock = getNewestBlock();
   const newBlockIndex = previousBlock.index + 1;
   const newTimestamp = getTimestamp();
-  const difficulty = findDifficulty(); 
+  const difficulty = findDifficulty();
   const newBlock = findBlock(
     newBlockIndex,
     previousBlock.hash,
     newTimestamp,
     data,
-    0,
     difficulty
   );
-
   addBlockToChain(newBlock);
-  require("./p2p").broadcastNewBlock(); 
+  require("./p2p").broadcastNewBlock();
   return newBlock;
 };
 
 const findDifficulty = () => {
   const newestBlock = getNewestBlock();
-  if (newestBlock.index % DIFFICULTY_ADJUSMENT_INTERVAL === 0 &&
-      newestBlock.index !== 0) { // 나눠진 결과가 0이라면
-    return calculateNewDifficulty(newestBlock, getBlockchain)
+  if (
+    newestBlock.index % DIFFICULTY_ADJUSMENT_INTERVAL === 0 &&
+    newestBlock.index !== 0
+  ) {
+    return calculateNewDifficulty(newestBlock, getBlockchain());
   } else {
     return newestBlock.difficulty;
   }
 };
 
-const calculateNewDifficulty = (newBlock, blockchain) => {
-  const latestBlock = blockchain[blockchain.length - DIFFICULTY_ADJUSMENT_INTERVAL] // 가장 최근 블록의 10개 전을 보여준다.
-  const timeExpected = BLOCK_GENERATION_INTERVAL * DIFFICULTY_ADJUSMENT_INTERVAL; // 그 블록들 사이의 소요시간
-  const timeTaken = newestBlock.timestamp - lastCalculatedBlock.timestamp; // 최근 블록과 난이도가 계산된 블록사이의 소요시간을 알려줌
-  if (timeTaken < timeExpected / 2) {//블록을 채굴하는데 걸리는 시간이 내가 예상한 시간(2배)보다 짧으면 난이도를 높임.
+const calculateNewDifficulty = (newestBlock, blockchain) => {
+  const lastCalculatedBlock =
+    blockchain[blockchain.length - DIFFICULTY_ADJUSMENT_INTERVAL];
+  const timeExpected =
+    BLOCK_GENERATION_INTERVAL * DIFFICULTY_ADJUSMENT_INTERVAL;
+  const timeTaken = newestBlock.timestamp - lastCalculatedBlock.timestamp;
+  if (timeTaken < timeExpected / 2) {
     return lastCalculatedBlock.difficulty + 1;
-  } else if (timeTaken > timeExpected * 2) { //채굴시간이 내가 예상한 시간(2배)보다 길면,난이도를 낮춘다.
-    return lastCalculatedBlock.difficult - 1;
+  } else if (timeTaken > timeExpected * 2) {
+    return lastCalculatedBlock.difficulty - 1;
   } else {
     return lastCalculatedBlock.difficulty;
   }
@@ -86,8 +85,8 @@ const calculateNewDifficulty = (newBlock, blockchain) => {
 
 const findBlock = (index, previousHash, timestamp, data, difficulty) => {
   let nonce = 0;
-  while(true) { // true가 될때까지 반복
-    console.log("Current nonce:", nonce)
+  while (true) {
+    console.log("Current nonce", nonce);
     const hash = createHash(
       index,
       previousHash,
@@ -96,44 +95,45 @@ const findBlock = (index, previousHash, timestamp, data, difficulty) => {
       difficulty,
       nonce
     );
-    if (hashMatchesDifficulty(hash,difficulty)) { //to do check amount of zeros(hash Matches difficulty)
+    if (hashMatchesDifficulty(hash, difficulty)) {
       return new Block(
-        index, 
-        hash, 
-        previousHash, 
-        timestamp, 
-        data, 
-        difficulty, 
-        nonce)
-    } 
-      nonce++
+        index,
+        hash,
+        previousHash,
+        timestamp,
+        data,
+        difficulty,
+        nonce
+      );
+    }
+    nonce++;
   }
 };
 
-const hashMatchesDifficulty = (hash, difficulty) => { // 여기서의 argument는 hash, difficulty 이다.
-  const hashInBinary = hexToBinary(hash); //
-  const requiredZeros = "0".repeat(difficulty); //"0" 을 difficulty만큼 반복
-  console.log("Trying difficulty:", difficulty, "with hash:", hash )
+const hashMatchesDifficulty = (hash, difficulty) => {
+  const hashInBinary = hexToBinary(hash);
+  const requiredZeros = "0".repeat(difficulty);
+  console.log("Trying difficulty:", difficulty, "with hash", hashInBinary);
   return hashInBinary.startsWith(requiredZeros);
-} 
+};
 
-const getBlocksHash = block => 
+const getBlocksHash = block =>
   createHash(
-    block.index, 
-    block.previousHash, 
-    block.timestamp, 
-    block.data, 
+    block.index,
+    block.previousHash,
+    block.timestamp,
+    block.data,
+    block.difficulty,
     block.nonce
   );
 
 const isTimeStampValid = (newBlock, oldBlock) => {
   return (
-    oldBlock.timestamp - 60 < newBlock.timestamp && 
-    newBlock.timestamp -60 < getTimestamp()
+    oldBlock.timestamp - 60 < newBlock.timestamp &&
+    newBlock.timestamp - 60 < getTimestamp()
   );
-}
+};
 
-//Validating the Block
 const isBlockValid = (candidateBlock, latestBlock) => {
   if (!isBlockStructureValid(candidateBlock)) {
     console.log("The candidate block structure is not valid");
@@ -150,7 +150,7 @@ const isBlockValid = (candidateBlock, latestBlock) => {
     console.log("The hash of this block is invalid");
     return false;
   } else if (!isTimeStampValid(candidateBlock, latestBlock)) {
-    console.log("The timeStamp of this block is dodgy")
+    console.log("The timestamp of this block is dodgy");
     return false;
   }
   return true;
@@ -184,10 +184,16 @@ const isChainValid = candidateChain => {
   return true;
 };
 
+const sumDifficulty = anyBlockchain =>
+  anyBlockchain
+  .map(block => block.difficulty)
+  .map(difficulty => Math.pow(2, difficulty))
+  .reduce((a, b) => a + b);
+
 const replaceChain = candidateChain => {
   if (
     isChainValid(candidateChain) &&
-    candidateChain.length > getBlockchain().length
+    sumDifficulty(candidateChain) > sumDifficulty(getBlockchain())
   ) {
     blockchain = candidateChain;
     return true;
@@ -206,9 +212,9 @@ const addBlockToChain = candidateBlock => {
 };
 
 module.exports = {
+  getNewestBlock,
   getBlockchain,
   createNewBlock,
-  getNewestBlock,
   isBlockStructureValid,
   addBlockToChain,
   replaceChain
