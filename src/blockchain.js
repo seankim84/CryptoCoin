@@ -63,10 +63,24 @@ const createNewBlock = data => {
 
 const findDifficulty = () => {
   const newestBlock = getNewestBlock();
-  if (newestBlock.index % DIFFICULTY_ADJUSMENT_INTERVAL === 0 && newestBlock.index !== 0) { // 나눠진 결과가 0이라면
-    // calculate new Difficulty
+  if (newestBlock.index % DIFFICULTY_ADJUSMENT_INTERVAL === 0 &&
+      newestBlock.index !== 0) { // 나눠진 결과가 0이라면
+    return calculateNewDifficulty(newestBlock, getBlockchain)
   } else {
-    return newBlock.difficulty;
+    return newestBlock.difficulty;
+  }
+};
+
+const calculateNewDifficulty = (newBlock, blockchain) => {
+  const latestBlock = blockchain[blockchain.length - DIFFICULTY_ADJUSMENT_INTERVAL] // 가장 최근 블록의 10개 전을 보여준다.
+  const timeExpected = BLOCK_GENERATION_INTERVAL * DIFFICULTY_ADJUSMENT_INTERVAL; // 그 블록들 사이의 소요시간
+  const timeTaken = newestBlock.timestamp - lastCalculatedBlock.timestamp; // 최근 블록과 난이도가 계산된 블록사이의 소요시간을 알려줌
+  if (timeTaken < timeExpected / 2) {//블록을 채굴하는데 걸리는 시간이 내가 예상한 시간(2배)보다 짧으면 난이도를 높임.
+    return lastCalculatedBlock.difficulty + 1;
+  } else if (timeTaken > timeExpected * 2) { //채굴시간이 내가 예상한 시간(2배)보다 길면,난이도를 낮춘다.
+    return lastCalculatedBlock.difficult - 1;
+  } else {
+    return lastCalculatedBlock.difficulty;
   }
 };
 
