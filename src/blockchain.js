@@ -33,7 +33,7 @@ let blockchain = [ genesisBlock ]; // Put the genesis block inside the block cha
 
 const getNewestBlock = () => blockchain[blockchain.length - 1];
 
-const getTimestamp = () => new Date().getTime() / 1000;
+const getTimestamp = () => Math.round(new Date().getTime() / 1000);
 
 const getBlockchain = () => blockchain;
 
@@ -52,7 +52,7 @@ const createNewBlock = data => {
     previousBlock.hash,
     newTimestamp,
     data,
-    20,
+    0,
     difficulty
   );
 
@@ -118,7 +118,20 @@ const hashMatchesDifficulty = (hash, difficulty) => { // 여기서의 argument�
 } 
 
 const getBlocksHash = block => 
-  createHash(block.index, block.previousHash, block.timestamp, block.data, block.nonce);
+  createHash(
+    block.index, 
+    block.previousHash, 
+    block.timestamp, 
+    block.data, 
+    block.nonce
+  );
+
+const isTimeStampValid = (newBlock, oldBlock) => {
+  return (
+    oldBlock.timestamp - 60 < newBlock.timestamp && 
+    newBlock.timestamp -60 < getTimestamp()
+  );
+}
 
 //Validating the Block
 const isBlockValid = (candidateBlock, latestBlock) => {
@@ -135,6 +148,9 @@ const isBlockValid = (candidateBlock, latestBlock) => {
     return false;
   } else if (getBlocksHash(candidateBlock) !== candidateBlock.hash) {
     console.log("The hash of this block is invalid");
+    return false;
+  } else if (!isTimeStampValid(candidateBlock, latestBlock)) {
+    console.log("The timeStamp of this block is dodgy")
     return false;
   }
   return true;
