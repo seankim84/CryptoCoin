@@ -1,3 +1,5 @@
+//input은 이전에는 output 이다.
+
 const CryptoJS = require("crypto-js"),
       elliptic = require("elliptic");
 
@@ -23,9 +25,9 @@ class Transaction {
 }
 
 class UTxOut {
-    constructor(uTxOutId, uTxOutputIndex, address, amount){
-        this.uTxOutId = uTxOutId;
-        this.uTxOutputIndex = uTxOutputIndex;
+    constructor(txOutId, txOutputIndex, address, amount){
+        this.txOutId = txOutId;
+        this.txOutputIndex = txOutputIndex;
         this.address = address;
         this.amount = amount;
     }
@@ -43,12 +45,18 @@ const getTxId = tx => { // tx 은 많은 수의 input과 output을 가진다. �
 return CryptoJS.SHA256(txInContent + txOutContent).toString();
 }
 
+const findTxOut = (txOutId, txOutIndex, uTxOutList) => {
+    return uTxOutList.find(
+        uTxOut = uTxOut.txOutId === txOutId && uTxOut.txOutIndex === txOutIndex
+    );
+}  
+
 const signTxIn = (tx, txInIndex, privateKey, uTxOut) => {
     const txIn = tx.txIns[txInIndex];
     const dataToSign = tx.id;
     // To Do: Find Tx
-    const referenceTxOut = null;
-    if(referenceTxOut === null) {
+    const referenceUTxOut = findTxOut(txIn.txOutId, tx.txOutIndex, uTxOuts);
+    if(referenceUTxOut === null) {
         return;
     }
-}
+};
