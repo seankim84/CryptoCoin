@@ -187,13 +187,13 @@ const isChainValid = candidateChain => {
 const sumDifficulty = anyBlockchain =>
   anyBlockchain
   .map(block => block.difficulty)
-  .map(difficulty => Math.pow(2, difficulty))
-  .reduce((a, b) => a + b);
+  .map(difficulty => Math.pow(2, difficulty)) // Math.pow(base, exponent)
+  .reduce((a, b) => a + b); // 하나의 단일값으로 줄일 때 사용
 
 const replaceChain = candidateChain => {
   if (
     isChainValid(candidateChain) &&
-    sumDifficulty(candidateChain) > sumDifficulty(getBlockchain())
+    sumDifficulty(candidateChain) > sumDifficulty(getBlockchain()) // 후보체인 > 현재체인
   ) {
     blockchain = candidateChain;
     return true;
