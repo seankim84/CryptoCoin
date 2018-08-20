@@ -1,9 +1,11 @@
 //input은 이전에는 output 이다.
 
 const CryptoJS = require("crypto-js"),
-      elliptic = require("elliptic");
+      elliptic = require("elliptic"),
+      utils  = require("./utils");
 
-const ec = new EC("secp256k1");
+const ec = new elliptic.ec("secp256k1");
+
 
 class TxOut { // 얼마의 코인이 있는지, 어디에 속해 있는지
     constructor(address, amount){
@@ -59,4 +61,7 @@ const signTxIn = (tx, txInIndex, privateKey, uTxOut) => {
     if(referenceUTxOut === null) {
         return;
     }
+    const key = ec.keyFromPrivate(privateKey, "hex");
+    const signature = utils.toHexString(key.sign(dataToSign).toDER());
+    return signature;
 };
