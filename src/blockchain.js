@@ -127,7 +127,7 @@ const getBlocksHash = block =>
     block.nonce
   );
 
-const isTimeStampValid = (newBlock, oldBlock) => {
+const isTimeStampValid = (newBlock, oldBlock) => { //TimeStamp Valid Checking
   return (
     oldBlock.timestamp - 60 < newBlock.timestamp &&
     newBlock.timestamp - 60 < getTimestamp()
