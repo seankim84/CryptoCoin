@@ -78,4 +78,9 @@ const updateUTxOuts = (newTxs, uTxOutList) => {
     const spentTxOuts = newTxs.map(tx => tx.txIns)
     .reduce((a,b) => a.contact(b), [])
     .map(txIn => new UTxOut(txIn.txOutId, txIn.txOutIndex, '', 0));
+
+    const resultingUTxOuts = uTxOutList.filter(uTxO => !findUTxOut(uTxO.txOutID, uTxO.txOutIndex, spentTxOuts)
+    ).concat(newUTxOuts);
+
+    return resultingUTxOuts;
 };
