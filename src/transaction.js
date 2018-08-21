@@ -73,14 +73,42 @@ const updateUTxOuts = (newTxs, uTxOutList) => {
                 new UTxOut(tx, id, index, txOut.address, txOut.amount);
             });
     })
-    .reduce((a,b) => a.contact(b), []); 
+    .reduce((a,b) => a.concat(b), []); 
     
     const spentTxOuts = newTxs.map(tx => tx.txIns)
-    .reduce((a,b) => a.contact(b), [])
+    .reduce((a,b) => a.concat(b), [])
     .map(txIn => new UTxOut(txIn.txOutId, txIn.txOutIndex, '', 0));
 
     const resultingUTxOuts = uTxOutList.filter(uTxO => !findUTxOut(uTxO.txOutID, uTxO.txOutIndex, spentTxOuts)
     ).concat(newUTxOuts);
 
     return resultingUTxOuts;
+};
+
+const isTxInStructureValid = (txIn) => {
+    //to do
+}
+
+const isTxOutStructureValid = (txOut) => {
+
+}
+
+const isTxStructureValid = (tx) => {
+    if (typeof tx.id !=="string"){
+        console.log("Tx Id is not Valid");
+        return false;
+    } else if(!(tx.txIns instanceof Array)){
+        console.log("The TxIns are not array")
+        return false;
+    } else if(){
+        console.log("The structure of one of the txIn is not valid")
+    } else if(!(tx.txOuts instanceof Array)){
+        console.log("The txOuts are not an array")
+        return false;
+    } else if(){
+        console.log("The structure of one of the txOut is not valid")
+        return false;
+    } else {
+        return true;
+    }
 };
