@@ -132,12 +132,12 @@ const isTxStructureValid = (tx) => {
     } else if(!(tx.txIns instanceof Array)){
         console.log("The TxIns are not array")
         return false;
-    } else if(){
+    } else if(!tx.txIns.map(isTxInStructureValid).reduce((a,b)=> a && b, true)){
         console.log("The structure of one of the txIn is not valid")
     } else if(!(tx.txOuts instanceof Array)){
         console.log("The txOuts are not an array")
         return false;
-    } else if(){
+    } else if(!tx.txOut.map(isTxOutStructureValid).reduce((a,b)=> a && b, true)){
         console.log("The structure of one of the txOut is not valid")
         return false;
     } else {
