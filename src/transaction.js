@@ -49,7 +49,7 @@ return CryptoJS.SHA256(txInContent + txOutContent).toString();
 
 const findTxOut = (txOutId, txOutIndex, uTxOutList) => {
     return uTxOutList.find(
-        uTxOut = uTxOut.txOutId === txOutId && uTxOut.txOutIndex === txOutIndex
+        uTxO = uTxO.txOutId === txOutId && uTxO.txOutIndex === txOutIndex
     );
 }  
 
@@ -145,12 +145,27 @@ const isTxStructureValid = (tx) => {
     }
 };
 
+const validateTxIn = (txIn, tx, uTxOutList) => {
+    const wantedTxOut = uTxOutList.find(
+        uTxO => uTxO.txOutId === txIn.txOutId && 
+        uTxO.txOutIndex === txIn.txOutIndex);
+    
+    if(wantedTxOut === null){
+        return false;
+    } else {
+        const address = wantedTxOut.address;
+        const key = ec.keyFromPublic(address, "hex");
+        return key.verify(tx.id, txIn.signature);
+    }
+};
+
 const validateTx = (tx, uTxOutList) => {
     if(getTxId(tx) !== tx.id){
         return false;
     }
 
-    const hashValidTxIns =  //to do
+    const hashValidTxIns =  tx.txIns.map(txIn => validateTxIn(txIn, tx, uTxOutList));
+
 
     if (!hashValidTxIns) {
         return false;
