@@ -63,7 +63,7 @@ const signTxIn = (tx, txInIndex, privateKey, uTxOut) => {
     }
     const key = ec.keyFromPrivate(privateKey, "hex");
     const signature = utils.toHexString(key.sign(dataToSign).toDER());
-    return signature;
+        return signature;
 };
 
 const updateUTxOuts = (newTxs, uTxOutList) => {
@@ -144,3 +144,25 @@ const isTxStructureValid = (tx) => {
         return true;
     }
 };
+
+const validateTx = (tx, uTxOutList) => {
+    if(getTxId(tx) !== tx.id){
+        return false;
+    }
+
+    const hashValidTxIns =  //to do
+
+    if (!hashValidTxIns) {
+        return false;
+    }
+
+    const amountInTxIns = //to do
+
+    const amountInTxOuts = //to do
+
+    if(amountInTxOuts !== amountinTxIns){
+        return false;
+    } else {
+        return true;
+    }
+}

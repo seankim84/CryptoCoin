@@ -1,5 +1,5 @@
 const CryptoJS = require("crypto-js"),
-  hexToBinary = require("hex-to-binary");
+      hexToBinary = require("hex-to-binary");
 
 const BLOCK_GENERATION_INTERVAL = 10;
 const DIFFICULTY_ADJUSMENT_INTERVAL = 10;
